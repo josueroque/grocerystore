@@ -11,10 +11,10 @@ const SalesTable = ({ rows = [] }) => {
   return (
     <TableContainer
       component={Paper}
-      style={{ maxWidth: 600, margin: 50 }}
-      className='SalesTable-component'
+      style={{ maxWidth: 600, align: "center", marginLeft: "25%" }}
+      className='SalesTableContainer'
     >
-      <Table aria-label='simple table'>
+      <Table aria-label='simple table' className='SalesTable'>
         <TableHead>
           <TableRow>
             <TableCell align='left'>Item</TableCell>
