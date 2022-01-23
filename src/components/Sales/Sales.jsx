@@ -8,13 +8,36 @@ import {
   InputLabel,
   Box,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SalesTable from "../SalesTable";
 import pricingTable from "./resources";
 
 const Sales = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [calculatedRows, setCalculatedRows] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [savings, setSavings] = useState(0);
+
+  useEffect(() => {
+    //Calculate the total
+    const totalPrice = calculatedRows
+      .map((item) => item.price)
+      .reduce(
+        (accumulator, value) => parseFloat(accumulator) + parseFloat(value),
+        0
+      );
+
+    setTotal(totalPrice);
+
+    //Calculate the savings
+    let totalSavings = 0;
+
+    calculatedRows.forEach((item) => {
+      if (item.unitPrice * item.quantity > item.price)
+        totalSavings += item.unitPrice * item.quantity - item.price;
+    });
+    setSavings(totalSavings.toFixed(2));
+  }, [calculatedRows]);
 
   const submit = () => {
     let itemSelected = calculatedRows.find((item) => item.id === selectedItem);
@@ -32,18 +55,24 @@ const Sales = () => {
 
     if (itemSelected.salePrice) {
       if (itemSelected.quantity < itemSelected.salePrice.quantity) {
-        itemSelected.price = itemSelected.unitPrice;
+        itemSelected.price = (
+          itemSelected.unitPrice * itemSelected.quantity
+        ).toFixed(2);
       } else {
         const groups = Math.floor(
           itemSelected.quantity / itemSelected.salePrice.quantity
         );
         const residue = itemSelected.quantity % itemSelected.salePrice.quantity;
 
-        itemSelected.price =
+        itemSelected.price = (
           groups * itemSelected.salePrice.price +
-          residue * itemSelected.unitPrice;
+          residue * itemSelected.unitPrice
+        ).toFixed(2);
       }
-    } else itemSelected.price = itemSelected.unitPrice * itemSelected.quantity;
+    } else
+      itemSelected.price = (
+        itemSelected.unitPrice * itemSelected.quantity
+      ).toFixed(2);
 
     setCalculatedRows([
       ...calculatedRows.filter((item) => item.id !== itemSelected.id),
@@ -57,7 +86,7 @@ const Sales = () => {
         Grocery Store
       </Typography>
       <Typography variant='h5' margin={2} align='center'>
-        Please Introduce the Items
+        Please add the buyed items
       </Typography>
       <div style={{ marginLeft: "25%", marginBottom: 25 }}>
         <FormGroup style={{ minWidth: 600, marginTop: 10 }}>
@@ -93,7 +122,11 @@ const Sales = () => {
           Add
         </Button>
       </Box>
-      <SalesTable rows={calculatedRows}></SalesTable>
+      <SalesTable
+        rows={calculatedRows}
+        total={total}
+        savings={savings}
+      ></SalesTable>
     </>
   );
 };
