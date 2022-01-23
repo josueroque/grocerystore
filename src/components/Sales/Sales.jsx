@@ -1,8 +1,6 @@
-import Container from "@mui/material/Container";
 import {
   Button,
   FormGroup,
-  TextField,
   Typography,
   Select,
   MenuItem,
@@ -15,14 +13,41 @@ import SalesTable from "../SalesTable";
 import pricingTable from "./resources";
 
 const Sales = () => {
-  const [saleItem, setSaleItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [calculatedRows, setCalculatedRows] = useState([]);
 
   const submit = () => {
-    console.log(calculatedRows);
+    let itemSelected = calculatedRows.find((item) => item.id === selectedItem);
+
+    if (!itemSelected) {
+      itemSelected = pricingTable.find((item) => item.id === selectedItem);
+
+      itemSelected.price = itemSelected.unitPrice;
+      itemSelected.quantity = 1;
+      setCalculatedRows([...calculatedRows, { ...itemSelected }]);
+      return;
+    }
+
+    itemSelected.quantity++;
+
+    if (itemSelected.salePrice) {
+      if (itemSelected.quantity < itemSelected.salePrice.quantity) {
+        itemSelected.price = itemSelected.unitPrice;
+      } else {
+        const groups = Math.floor(
+          itemSelected.quantity / itemSelected.salePrice.quantity
+        );
+        const residue = itemSelected.quantity % itemSelected.salePrice.quantity;
+
+        itemSelected.price =
+          groups * itemSelected.salePrice.price +
+          residue * itemSelected.unitPrice;
+      }
+    } else itemSelected.price = itemSelected.unitPrice * itemSelected.quantity;
+
     setCalculatedRows([
-      ...calculatedRows,
-      { id: 1, item: "Milk", quantity: 1, price: 3.97 },
+      ...calculatedRows.filter((item) => item.id !== itemSelected.id),
+      itemSelected,
     ]);
   };
 
@@ -32,7 +57,7 @@ const Sales = () => {
         Grocery Store
       </Typography>
       <Typography variant='h5' margin={2} align='center'>
-        Please Introduce the Item and its Quantity
+        Please Introduce the Items
       </Typography>
       <div style={{ marginLeft: "25%", marginBottom: 25 }}>
         <FormGroup style={{ minWidth: 600, marginTop: 10 }}>
@@ -40,9 +65,9 @@ const Sales = () => {
             <InputLabel id='select-label'>Select Item</InputLabel>
             <Select
               labelId='select-label'
-              value={saleItem}
+              value={selectedItem}
               onChange={(e) => {
-                setSaleItem(e.target.value);
+                setSelectedItem(e.target.value);
               }}
               required
               label='Select item'
