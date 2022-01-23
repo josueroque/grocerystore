@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -26,7 +26,7 @@ const SalesTable = ({ rows = [] }) => {
           {rows.length > 0
             ? rows.map((row) => (
                 <TableRow
-                  key={row.SSN}
+                  key={row.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell align='left'>{row.item}</TableCell>

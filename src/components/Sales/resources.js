@@ -1,4 +1,4 @@
-export const pricingTable = [
+const pricingTable = [
   {
     id: 1,
     productName: "Milk",
@@ -14,3 +14,5 @@ export const pricingTable = [
   { id: 3, productName: "Banana", unitPrice: 0.99 },
   { id: 4, productName: "Apple", unitPrice: 0.89 },
 ];
+
+export default pricingTable;
