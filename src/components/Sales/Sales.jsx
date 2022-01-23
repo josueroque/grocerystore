@@ -11,6 +11,7 @@ import {
 import React, { useState, useEffect } from "react";
 import SalesTable from "../SalesTable";
 import pricingTable from "./resources";
+import swal from "sweetalert";
 
 const Sales = () => {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -39,7 +40,19 @@ const Sales = () => {
     setSavings(totalSavings.toFixed(2));
   }, [calculatedRows]);
 
+  const reset = () => {
+    setSelectedItem(null);
+    setCalculatedRows([]);
+    setTotal(0);
+    setSavings(0);
+  };
+
   const submit = () => {
+    if (!selectedItem) {
+      swal("You must select an item first!", "", "warning");
+      return;
+    }
+
     let itemSelected = calculatedRows.find((item) => item.id === selectedItem);
 
     if (!itemSelected) {
@@ -120,6 +133,14 @@ const Sales = () => {
           style={{ width: 100, marginBottom: 25 }}
         >
           Add
+        </Button>
+        <Button
+          variant='contained'
+          align='center'
+          onClick={reset}
+          style={{ width: 100, marginBottom: 25, marginLeft: 20 }}
+        >
+          Reset
         </Button>
       </Box>
       <SalesTable
